@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<link rel="stylesheet" type="text/css" href="./style.css">
+</head>
+<body>
+
+<div class="container">
+	<div class="drag-zone">
+		<div class="item-group">
+			<div class="item">Item1</div>
+			<div class="drag-zone inner"></div>
+		</div>
+		<div class="item-group">
+			<div class="item">Item2</div>
+			<div class="drag-zone inner"></div>
+		</div>
+		<div class="item-group">
+			<div class="item">Item3</div>
+			<div class="drag-zone inner"></div>
+		</div>
+		<div class="item-group">
+			<div class="item">Item4</div>
+			<div class="drag-zone inner"></div>
+		</div>
+		<div class="item-group">
+			<div class="item">Item5</div>
+			<div class="drag-zone inner"></div>
+		</div>
+	</div>
+</div>
+
+<style>
+	.container{
+		width: 300px;
+		margin: 0 auto;
+	}
+
+	.drag-zone .item{
+		min-height: 50px;
+		line-height: 50px;
+		border: 1px solid #ccc;
+		padding-left: 10px;
+	}
+
+	.inner{
+		margin-left: 20px;
+	}
+
+	.sortable-ghost{
+		background-color:aquamarine;
+	}
+
+	.sortable-fallback{
+		display: none;
+	}
+</style>
+
+<script src="../Sortable.js"></script>
+
+<script type="text/javascript">
+	var elements = document.getElementsByClassName('drag-zone');
+
+	for (var i = 0; i < elements.length; i++) {
+		var instance = new Sortable(elements[i], {
+			group: 'shared',
+			// invertSwap: true,
+			// swapThreshold: 0.2,
+			// emptyInsertThreshold: 5,
+			// forceFallback: true,
+			jdNestMode: true,
+			itemHeight: 50,	
+			indent: 20,
+		});
+	}
+</script>
+
+</body>
+</html>

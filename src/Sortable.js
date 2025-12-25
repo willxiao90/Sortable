@@ -124,6 +124,7 @@ let dragEl,
 	tapDistanceTop,
 
 	moved,
+	dragedRightStraight,
 
 	lastTarget,
 	lastDirection,
@@ -233,9 +234,16 @@ let dragEl,
 			const threshold = sortable[expando].options.emptyInsertThreshold;
 			if (!threshold || lastChild(sortable)) return;
 
-			const rect = getRect(sortable),
+			let rect = getRect(sortable),
 				insideHorizontally = x >= (rect.left - threshold) && x <= (rect.right + threshold),
 				insideVertically = y >= (rect.top - threshold) && y <= (rect.bottom + threshold);
+
+			const jdNestMode = sortable[expando].options.jdNestMode
+			if(jdNestMode && dragedRightStraight) {
+				const itemHeight = sortable[expando].options.itemHeight
+				insideHorizontally = x >= (rect.left - threshold ) && x <= (rect.right + threshold);
+				insideVertically = y >= (rect.top - threshold) && y <= (rect.bottom + itemHeight);
+			}
 
 			if (insideHorizontally && insideVertically) {
 				return (ret = sortable);
@@ -315,7 +323,27 @@ if (documentExists && !ChromeForAndroid) {
 let nearestEmptyInsertDetectEvent = function(evt) {
 	if (dragEl) {
 		evt = evt.touches ? evt.touches[0] : evt;
+
+		if (Sortable.active) {
+			const options = Sortable.active.options;
+			const itemHeight = options.itemHeight;
+			const indent = options.indent;
+			const emptyInsertThreshold = options.emptyInsertThreshold;
+			const dragStartClientX = tapEvt.clientX;
+			const dragStartClientY = tapEvt.clientY;
+			dragedRightStraight =
+				evt.clientX - dragStartClientX > indent &&
+				Math.abs(evt.clientY - dragStartClientY) < itemHeight / 2 - emptyInsertThreshold;
+			// console.log(
+			// 	{ dragedRightStraight },
+			// 	options,
+			// 	evt.clientX - dragStartClientX,
+			// 	dragStartClientX
+			// );
+		}
+		
 		let nearest = _detectNearestEmptySortable(evt.clientX, evt.clientY);
+		// console.log(nearest)
 
 		if (nearest) {
 			// Create imitation event
@@ -396,7 +424,10 @@ function Sortable(el, options) {
 		fallbackOffset: {x: 0, y: 0},
 		// Disabled on Safari: #1571; Enabled on Safari IOS: #2244
 		supportPointer: Sortable.supportPointer !== false && ('PointerEvent' in window) && (!Safari || IOS),
-		emptyInsertThreshold: 5
+		emptyInsertThreshold: 5,
+		jdNestMode: false,
+		itemHeight: 40,
+		indent: 20,
 	};
 
 	PluginManager.initializePlugins(this, el, defaults);
